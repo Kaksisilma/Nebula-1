@@ -23,6 +23,16 @@
 	required_reagents = list(/decl/material/liquid/oxy_meds = 1, /decl/material/solid/carbon = 1, /decl/material/solid/metal/iron = 1)
 	result_amount = 3
 
+/decl/chemical_reaction/sedatives
+	name = "Midazolam"
+	result = /decl/material/liquid/sedatives
+	required_reagents = list(/decl/material/liquid/ethanol = 1, /decl/material/liquid/nutriment/sugar = 2, /decl/material/liquid/acetone = 1
+	)
+	inhibitors = list(
+		/decl/material/solid/phosphorus
+	) // Messes with the smoke
+	result_amount = 4
+
 /decl/chemical_reaction/paracetamol
 	name = "Paracetamol"
 	result = /decl/material/liquid/painkillers/paracetamol
