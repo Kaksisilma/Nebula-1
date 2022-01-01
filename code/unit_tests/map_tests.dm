@@ -322,14 +322,14 @@
 	var/space_landmarks = 0
 
 	for(var/lm in global.landmarks_list)
-		var/obj/effect/landmark/landmark = lm
-		if(istype(landmark, /obj/effect/landmark/test/safe_turf))
+		var/obj/abstract/landmark/landmark = lm
+		if(istype(landmark, /obj/abstract/landmark/test/safe_turf))
 			log_debug("Safe landmark found: [log_info_line(landmark)]")
 			safe_landmarks++
-		else if(istype(landmark, /obj/effect/landmark/test/space_turf))
+		else if(istype(landmark, /obj/abstract/landmark/test/space_turf))
 			log_debug("Space landmark found: [log_info_line(landmark)]")
 			space_landmarks++
-		else if(istype(landmark, /obj/effect/landmark/test))
+		else if(istype(landmark, /obj/abstract/landmark/test))
 			log_debug("Test landmark with unknown tag found: [log_info_line(landmark)]")
 
 	if(safe_landmarks != 1 || space_landmarks != 1)
@@ -481,6 +481,34 @@
 		else
 			return TRUE
 	return FALSE
+
+//=======================================================================================
+
+/datum/unit_test/disposal_overlap_test
+	name = "MAP: Disposal Pipe Overlap Test"
+
+/datum/unit_test/disposal_overlap_test/start_test()
+	var/disposal_test_count = 0
+	var/bad_tests = 0
+	var/turf/T = null
+	var/obj/structure/disposalpipe/D = null
+	var/list/pipe_turfs = list()
+
+	for(D in world)
+		disposal_test_count++
+		T = get_turf(D)
+		if(pipe_turfs[T])
+			var/bad_msg = "[ascii_red]--------------- [T.name] \[[T.x] / [T.y] / [T.z]\]"
+			bad_tests++
+			log_unit_test("[bad_msg] contains multiple pipes overlapping.")
+		pipe_turfs |= T
+
+	if(bad_tests)
+		fail("\[[bad_tests] / [disposal_test_count]\] Some turfs had overlapping pipes.")
+	else
+		pass("All \[[disposal_test_count]\] pipes did not overlap.")
+
+	return 1
 
 //=======================================================================================
 
@@ -819,7 +847,7 @@
 			log_bad("Invalid door turf: [log_info_line(D.loc)]]")
 		else
 			var/list/turf_exceptions
-			var/obj/effect/landmark/map_data/MD = get_map_data(D.loc.z)
+			var/obj/abstract/map_data/MD = get_map_data(D.loc.z)
 			if(UNLINT(MD?.UT_turf_exceptions_by_door_type))
 				turf_exceptions = UNLINT(MD.UT_turf_exceptions_by_door_type[D.type])
 

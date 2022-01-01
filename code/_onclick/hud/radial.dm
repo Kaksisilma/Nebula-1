@@ -32,6 +32,8 @@ var/global/list/radial_menus = list()
 		closeToolTip(usr)
 
 /obj/screen/radial/slice/Click(location, control, params)
+	if(QDELETED(src) || QDELETED(parent))
+		return
 	if(parent && usr.client == parent.current_user)
 		if(next_page)
 			parent.next_page()
@@ -51,6 +53,8 @@ var/global/list/radial_menus = list()
 	icon_state = "radial_center"
 
 /obj/screen/radial/center/Click(location, control, params)
+	if(QDELETED(src) || QDELETED(parent))
+		return
 	if(usr.client == parent.current_user)
 		parent.finished = TRUE
 
@@ -268,12 +272,13 @@ var/global/list/radial_menus = list()
 	//Blank
 	menu_holder = image(icon = 'icons/effects/effects.dmi', loc = anchor, icon_state = "nothing", layer = HUD_ABOVE_ITEM_LAYER)
 	menu_holder.appearance_flags |= KEEP_APART
-	menu_holder.vis_contents += elements + close_button
+	add_vis_contents(menu_holder, elements + close_button)
 	current_user.images += menu_holder
 
 /datum/radial_menu/proc/hide()
 	if(current_user)
 		current_user.images -= menu_holder
+	clear_vis_contents(menu_holder)
 
 /datum/radial_menu/proc/wait(atom/user, atom/anchor, require_near = FALSE, list/check_locs)
 	while (current_user && !finished && !selected_choice)

@@ -19,7 +19,7 @@
 
 /obj/machinery/appliance/cooker/examine(var/mob/user)
 	. = ..()
-	if (.)	//no need to duplicate adjacency check
+	if (Adjacent(user))
 		if (use_power == POWER_USE_OFF)
 			to_chat(user, SPAN_WARNING("It is switched off."))
 		else
@@ -28,6 +28,8 @@
 			else
 				to_chat(user, SPAN_NOTICE("It is running at [round(get_efficiency(), 0.1)]% efficiency!"))
 			to_chat(user, "Temperature: [round(temperature - T0C, 0.1)]C / [round(optimal_temp - T0C, 0.1)]C")
+	if(panel_open)
+		to_chat(user, "The panel is open.")
 
 /obj/machinery/appliance/cooker/MouseEntered(location, control, params)
 	. = ..()
@@ -158,13 +160,13 @@
 	if (temperature < set_temp)
 		if (use_power == POWER_USE_IDLE && ((set_temp - temperature) > 5))
 			playsound(src, 'sound/machines/click.ogg', 20, 1)
-			use_power = POWER_USE_ACTIVE //If we're heating we use the active power
+			update_use_power(POWER_USE_ACTIVE) //If we're heating we use the active power
 			update_icon()
 		ADJUST_ATOM_TEMPERATURE(src, temperature + heating_power / resistance)
 		update_cooking_power()
 	else
 		if (use_power == POWER_USE_ACTIVE)
-			use_power = POWER_USE_IDLE
+			update_use_power(POWER_USE_IDLE)
 			playsound(src, 'sound/machines/click.ogg', 20, 1)
 			update_icon()
 	QUEUE_TEMPERATURE_ATOMS(src)
